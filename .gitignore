@@ -1,0 +1,9 @@
+
+*.jar
+*.class
+*.zip
+.idea/*
+target/*
+.idea
+lib/keep.red
+SwicthModule.iml
