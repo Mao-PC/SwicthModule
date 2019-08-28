@@ -1,7 +1,9 @@
 package com.nnlight.view;
 
+import com.nnlight.listeners.*;
+
 import javax.swing.*;
-import javax.swing.border.LineBorder;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 
 import static com.nnlight.Client.*;
@@ -23,6 +25,9 @@ public class ViewLayout {
         }
         return viewLayout;
     }
+
+    // 字体
+    private Font font = new Font("微软雅黑", Font.PLAIN, 15);
 
     // 端口选择
     private JLabel serialPortSelectLabel = new JLabel("串口选择 : ");
@@ -46,7 +51,7 @@ public class ViewLayout {
     private JLabel spaceLabel = new JLabel("动作间隔");
 
 
-    private Color backgroupColor = Color.WHITE;
+//    private Color backgroupColor = Color.
 
     private void add(Component component, String layout){
         getClient().add(component, layout);
@@ -66,86 +71,138 @@ public class ViewLayout {
         setLayout(new BorderLayout());
 
         // 设置监听面板
-        listenPanel.setBackground(backgroupColor);
-//        listenPanel.setPreferredSize(new Dimension(700, 70));
         add(listenPanel, BorderLayout.NORTH);
 
         listenPanel.add(serialPortSelectLabel);
-        portComboBox.setPreferredSize(new Dimension(100, 30));
-        listenPanel.add(portComboBox);
+        commChoice.setPreferredSize(new Dimension(150, 30));
+        listenPanel.add(commChoice);
+
+        // 监听
+        listenButton.addActionListener(new ListenButtonListener());
         listenPanel.add(listenButton);
+
+        // 取消监听
+        cancelListenButton.addActionListener(new CancelListenButtonListener());
         listenPanel.add(cancelListenButton);
 
         // 设置设置面板
-        settingPanel.setBackground(backgroupColor);
         settingPanel.setPreferredSize(new Dimension());
         settingPanel.setBorder(BorderFactory.createTitledBorder("设置区"));
-        settingPanel.setPreferredSize(new Dimension(350, 400));
+        settingPanel.setPreferredSize(new Dimension(400, 400));
 
         // 设置面板使用网格布局
         settingPanel.setLayout(null);
         // 设置IMEI
-        int settingY = 30;
+        int settingY = 50;
         imeiLabel.setBounds(30, settingY, 60, 30);
         settingPanel.add(imeiLabel);
-        imeiText.setBounds(90, settingY, 100, 30);
+        imeiText.setBounds(90, settingY, 150, 30);
         settingPanel.add(imeiText);
-        imeiSetButton.setBounds(200, settingY, 50, 30);
+        imeiSetButton.setBounds(250, settingY, 60, 30);
+        imeiSetButton.addActionListener(new IMEISetButtonListener());
         settingPanel.add(imeiSetButton);
-        imeiReadButton.setBounds(260, settingY, 70, 30);
+        imeiReadButton.setBounds(320, settingY, 70, 30);
+        imeiReadButton.addActionListener(new IMEIReadButtonListener());
         settingPanel.add(imeiReadButton);
+        imeiWaringLabel.setBounds(30, settingY + 30, 250, 30);
+        imeiWaringLabel.setFont(font);
+        imeiWaringLabel.setForeground(Color.RED);
+        settingPanel.add(imeiWaringLabel);
 
         // areaid
-        settingY += 40;
+        settingY += 70;
         areaLabel.setBounds(30, settingY, 60, 30);
         settingPanel.add(areaLabel);
-        areaText.setBounds(90, settingY, 100, 30);
+        areaText.setBounds(90, settingY, 150, 30);
         settingPanel.add(areaText);
-        areaSetButton.setBounds(200, settingY, 50, 30);
+        areaSetButton.setBounds(250, settingY, 60, 30);
+        areaSetButton.addActionListener(new AREASetButtonListener());
         settingPanel.add(areaSetButton);
-        areaReadButton.setBounds(260, settingY, 70, 30);
+        areaReadButton.setBounds(320, settingY, 70, 30);
+        areaReadButton.addActionListener(new AREAReadButtonListener());
         settingPanel.add(areaReadButton);
+        areaWaringLabel.setBounds(30, settingY + 30, 250, 30);
+        areaWaringLabel.setFont(font);
+        areaWaringLabel.setForeground(Color.RED);
+        settingPanel.add(areaWaringLabel);
 
         // boxid
-        settingY += 40;
+        settingY += 70;
         boxLabel.setBounds(30, settingY, 60, 30);
         settingPanel.add(boxLabel);
-        boxText.setBounds(90, settingY, 100, 30);
+        boxText.setBounds(90, settingY, 150, 30);
         settingPanel.add(boxText);
-        boxSetButton.setBounds(200, settingY, 50, 30);
+        boxSetButton.setBounds(250, settingY, 60, 30);
+        boxSetButton.addActionListener(new BOXSetButtonListener());
         settingPanel.add(boxSetButton);
-        boxReadButton.setBounds(260, settingY, 70, 30);
+        boxReadButton.setBounds(320, settingY, 70, 30);
+        boxReadButton.addActionListener(new BOXReadButtonListener());
         settingPanel.add(boxReadButton);
+        boxWaringLabel.setBounds(30, settingY + 30, 250, 30);
+        boxWaringLabel.setFont(font);
+        boxWaringLabel.setForeground(Color.RED);
+        settingPanel.add(boxWaringLabel);
 
         // 动作间隔
-        settingY += 40;
+        settingY += 70;
         spaceLabel.setBounds(30, settingY, 60, 30);
         settingPanel.add(spaceLabel);
-        spaceText.setBounds(90, settingY, 100, 30);
+        spaceText.setBounds(90, settingY, 150, 30);
         settingPanel.add(spaceText);
-        spaceSetButton.setBounds(200, settingY, 50, 30);
+        spaceSetButton.setBounds(250, settingY, 60, 30);
+        spaceSetButton.addActionListener(new SpaceSetButtonListener());
         settingPanel.add(spaceSetButton);
-        spaceReadButton.setBounds(260, settingY, 70, 30);
+        spaceReadButton.setBounds(320, settingY, 70, 30);
+        spaceReadButton.addActionListener(new SpaceReadButtonListener());
         settingPanel.add(spaceReadButton);
+        spaceWaringLabel.setBounds(30, settingY + 30, 250, 30);
+        spaceWaringLabel.setFont(font);
+        spaceWaringLabel.setForeground(Color.RED);
+        settingPanel.add(spaceWaringLabel);
 
         add(settingPanel,BorderLayout.WEST);
 
         // 设置测试面板
-        testPanel.setBackground(backgroupColor);
         testPanel.setBorder(BorderFactory.createTitledBorder("测试区"));
+        // 滚动面板
+        JScrollPane jsp = new JScrollPane(testArea);
+        jsp.setPreferredSize(new Dimension(550, 320));
+//        testArea.setPreferredSize(new Dimension(550, 250));
+//        testArea.setMaximumSize(new Dimension(550, 250));
+        testArea.setFont(font);
+        // 显示最后一行
+//        testArea.setCaretPosition(testArea.getText().length());
+        //设置自己主动换行，之后则不须要设置水平滚动栏
+        testArea.setLineWrap(true);
+        // 设置滚动条
+        jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        // 监听
+        testArea.getDocument().addDocumentListener(new testAreaListener());
+
+        ((DefaultCaret)testArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        jsp.setViewportView(testArea);
+        testPanel.add(jsp);
         add(testPanel, BorderLayout.CENTER);
 
+
         // 功能区面板
-        optPanel.setBackground(backgroupColor);
         optPanel.setBorder(BorderFactory.createTitledBorder("操作区"));
-        optPanel.setPreferredSize(new Dimension(800, 100));
+        optPanel.setPreferredSize(new Dimension(800, 150));
 
         // 全开
+        openButton.addActionListener(new OpenAllButtonListener());
         optPanel.add(openButton);
         // 全关
+        closeButton.addActionListener(new CloseAllButtonListener());
         optPanel.add(closeButton);
+
         // 读数据
+        readButton.addActionListener(new ReadButtonListener());
         optPanel.add(readButton);
+
+        // 清空测试区
+        clearButton.addActionListener(new ClearButtonListener());
+        optPanel.add(clearButton);
 
         add(optPanel, BorderLayout.SOUTH);
     }
