@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 public class AREASetButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+        Client.isReadStatus = false;
+
         // AREAID
         String areaStr = Client.areaText.getText().trim();
 
@@ -26,6 +28,6 @@ public class AREASetButtonListener implements ActionListener {
             return;
         }
 
-        CommonUtil.sendMsg(MsgEntity.AREASETTOKEN + areaStr);
+        CommonUtil.sendStringMsg(MsgEntity.AREASETTOKEN + areaStr);
     }
 }

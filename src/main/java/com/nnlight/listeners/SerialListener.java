@@ -1,13 +1,17 @@
 package com.nnlight.listeners;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nnlight.entity.MsgEntity;
 import com.nnlight.exception.ReadDataFromSerialPortFailure;
 import com.nnlight.exception.SerialPortInputStreamCloseFailure;
+import com.nnlight.utils.FormatUtil;
 import com.nnlight.utils.SerialTool;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.nnlight.Client.*;
@@ -20,11 +24,7 @@ import static com.nnlight.Client.*;
 public class SerialListener implements SerialPortEventListener {
 
 
-    private volatile StringBuffer sb = new StringBuffer();
-
-    // 是否开始向 sb 中 append 的标志
-    private boolean flag = false;
-
+    private List<String> dataBytes = new ArrayList<>();
 
     /**
      * 处理监控到的串口事件
@@ -74,10 +74,40 @@ public class SerialListener implements SerialPortEventListener {
                                 listenFlag = true;
                                 //System.exit(0);
                             } else {
-                                String dataOriginal = new String(data);    //将字节数组数据转换位为保存了原始数据的字符串
-                                System.out.println("接收到数据 ： " + dataOriginal);
+                                if (!isReadStatus) {
+                                    String dataOriginal = new String(data);    //将字节数组数据转换位为保存了原始数据的字符串
+                                    System.out.println("接收到数据 ： " + dataOriginal);
 
-                                testArea.append(dataOriginal);
+                                    testArea.append(dataOriginal);
+                                } else {
+                                    String dataOriginal = FormatUtil.bytesToHexString(data);
+
+                                    System.out.println("接收到数据 ： " + dataOriginal);
+
+                                    testArea.append(dataOriginal);
+
+                                    for (String s : dataOriginal.split("\\s+")) {
+                                        dataBytes.add(s);
+                                    }
+
+                                    // 检查是否结束
+                                    boolean flag = true;
+                                    String[] endFlagArr = MsgEntity.ENDFLAG.split(" ");
+                                    int length = endFlagArr.length;
+                                    for (int i = 0; i < length; i++) {
+                                        if (!endFlagArr[length - 1 - i].equals(dataBytes.get(dataBytes.size() - 1 - i))) {
+                                            flag = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (flag) {
+                                        // 这里加一个换行, 否则会影响后续的数据读取
+                                        testArea.append(System.lineSeparator());
+                                        dataBytes.clear();
+                                        isReadStatus = false;
+                                    }
+                                }
 
                                 // 设置动作已结束
                                 actiongFlag = false;

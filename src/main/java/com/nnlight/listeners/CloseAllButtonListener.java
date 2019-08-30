@@ -1,5 +1,9 @@
 package com.nnlight.listeners;
 
+import com.nnlight.Client;
+import com.nnlight.entity.MsgEntity;
+import com.nnlight.utils.CommonUtil;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,6 +15,13 @@ import java.awt.event.ActionListener;
 public class CloseAllButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+        Client.isReadStatus = false;
 
+        String[] msgs = MsgEntity.CLOSEALL.split(" ");
+        byte[] command = new byte[msgs.length];
+        for (int i = 0; i < msgs.length; i++) {
+            command[i] = (byte)Integer.parseInt(msgs[i], 16);
+        }
+        CommonUtil.sendBetyMsg(command);
     }
 }

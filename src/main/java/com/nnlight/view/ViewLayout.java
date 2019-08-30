@@ -1,10 +1,19 @@
 package com.nnlight.view;
 
+import com.nnlight.Client;
 import com.nnlight.listeners.*;
+import com.nnlight.utils.CommonUtil;
+import com.nnlight.utils.ExcelUtil;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.nnlight.Client.*;
 
@@ -19,7 +28,7 @@ public class ViewLayout {
 
     private static ViewLayout viewLayout = null;
 
-    public static ViewLayout getViewLayout () {
+    public static ViewLayout getViewLayout() {
         if (viewLayout == null) {
             viewLayout = new ViewLayout();
         }
@@ -27,13 +36,16 @@ public class ViewLayout {
     }
 
     // 字体
-    private Font font = new Font("微软雅黑", Font.PLAIN, 15);
+    private Font font = new Font("微软雅黑", Font.PLAIN, 13);
 
     // 端口选择
     private JLabel serialPortSelectLabel = new JLabel("串口选择 : ");
 
     // 监听面板
     private JPanel listenPanel = new JPanel();
+    // 监听内部面板
+    JPanel listenAreaPanel = new JPanel();
+
     // 设置面板
     private JPanel settingPanel = new JPanel();
     // 测试面板
@@ -50,10 +62,9 @@ public class ViewLayout {
     // 动作间隔 label
     private JLabel spaceLabel = new JLabel("动作间隔");
 
-
 //    private Color backgroupColor = Color.
 
-    private void add(Component component, String layout){
+    private void add(Component component, String layout) {
         getClient().add(component, layout);
     }
 
@@ -66,11 +77,13 @@ public class ViewLayout {
     }
 
     public void setPanelLayout() {
-
         // 整体采用边框布局
         setLayout(new BorderLayout());
 
         // 设置监听面板
+        listenPanel.setPreferredSize(new Dimension(1000, 70));
+
+        listenPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         add(listenPanel, BorderLayout.NORTH);
 
         listenPanel.add(serialPortSelectLabel);
@@ -83,11 +96,13 @@ public class ViewLayout {
 
         // 取消监听
         cancelListenButton.addActionListener(new CancelListenButtonListener());
+        cancelListenButton.setEnabled(!listenFlag);
         listenPanel.add(cancelListenButton);
 
         // 设置设置面板
-        settingPanel.setPreferredSize(new Dimension());
-        settingPanel.setBorder(BorderFactory.createTitledBorder("设置区"));
+        TitledBorder settingArea = BorderFactory.createTitledBorder("设置区");
+        settingArea.setTitleFont(font);
+        settingPanel.setBorder(settingArea);
         settingPanel.setPreferredSize(new Dimension(400, 400));
 
         // 设置面板使用网格布局
@@ -97,6 +112,7 @@ public class ViewLayout {
         imeiLabel.setBounds(30, settingY, 60, 30);
         settingPanel.add(imeiLabel);
         imeiText.setBounds(90, settingY, 150, 30);
+        imeiText.setText(CommonUtil.getIncImei(ExcelUtil.getLastIMEI(), 17));
         settingPanel.add(imeiText);
         imeiSetButton.setBounds(250, settingY, 60, 30);
         imeiSetButton.addActionListener(new IMEISetButtonListener());
@@ -160,34 +176,39 @@ public class ViewLayout {
         spaceWaringLabel.setForeground(Color.RED);
         settingPanel.add(spaceWaringLabel);
 
-        add(settingPanel,BorderLayout.WEST);
+        add(settingPanel, BorderLayout.WEST);
 
         // 设置测试面板
-        testPanel.setBorder(BorderFactory.createTitledBorder("测试区"));
+        TitledBorder testArea = BorderFactory.createTitledBorder("测试区");
+        testArea.setTitleFont(font);
+        testPanel.setBorder(testArea);
         // 滚动面板
-        JScrollPane jsp = new JScrollPane(testArea);
+        JScrollPane jsp = new JScrollPane(Client.testArea);
         jsp.setPreferredSize(new Dimension(550, 320));
 //        testArea.setPreferredSize(new Dimension(550, 250));
 //        testArea.setMaximumSize(new Dimension(550, 250));
-        testArea.setFont(font);
+        Client.testArea.setFont(font);
         // 显示最后一行
 //        testArea.setCaretPosition(testArea.getText().length());
         //设置自己主动换行，之后则不须要设置水平滚动栏
-        testArea.setLineWrap(true);
+        Client.testArea.setLineWrap(true);
         // 设置滚动条
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         // 监听
-        testArea.getDocument().addDocumentListener(new testAreaListener());
+        Client.testArea.getDocument().addDocumentListener(new testAreaListener());
 
-        ((DefaultCaret)testArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        jsp.setViewportView(testArea);
+        ((DefaultCaret) Client.testArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        jsp.setViewportView(Client.testArea);
         testPanel.add(jsp);
         add(testPanel, BorderLayout.CENTER);
 
 
         // 功能区面板
-        optPanel.setBorder(BorderFactory.createTitledBorder("操作区"));
-        optPanel.setPreferredSize(new Dimension(800, 150));
+        TitledBorder optBorder = BorderFactory.createTitledBorder("操作区");
+        optBorder.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        optPanel.setBorder(optBorder);
+        optPanel.setPreferredSize(new Dimension(800, 100));
 
         // 全开
         openButton.addActionListener(new OpenAllButtonListener());
@@ -197,7 +218,7 @@ public class ViewLayout {
         optPanel.add(closeButton);
 
         // 读数据
-        readButton.addActionListener(new ReadButtonListener());
+        readButton.addActionListener(new ReadStatusButtonListener());
         optPanel.add(readButton);
 
         // 清空测试区
@@ -205,6 +226,41 @@ public class ViewLayout {
         optPanel.add(clearButton);
 
         add(optPanel, BorderLayout.SOUTH);
+
+        // 设置字体
+        setComponentFont(font);
+
+        // 设置面板上的组件状态
+        setComponentEnabled(!listenFlag);
+    }
+
+    /**
+     * 设置面板上的组件是否可用
+     */
+    private void setComponentFont(Font font) {
+        List<Component> components = new ArrayList<>();
+        components.addAll(Arrays.asList(listenPanel.getComponents()));
+        components.addAll(Arrays.asList(settingPanel.getComponents()));
+        components.addAll(Arrays.asList(testPanel.getComponents()));
+        components.addAll(Arrays.asList(optPanel.getComponents()));
+
+        for (Component component : components) {
+            component.setFont(font);
+        }
+    }
+
+    /**
+     * 设置面板上的组件是否可用
+     */
+    public void setComponentEnabled(boolean enabled) {
+        List<Component> components = new ArrayList<>();
+        components.addAll(Arrays.asList(settingPanel.getComponents()));
+        components.addAll(Arrays.asList(testPanel.getComponents()));
+        components.addAll(Arrays.asList(optPanel.getComponents()));
+
+        for (Component component : components) {
+            component.setEnabled(enabled);
+        }
     }
 
 }

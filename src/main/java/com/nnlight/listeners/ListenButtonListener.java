@@ -2,6 +2,7 @@ package com.nnlight.listeners;
 
 import com.nnlight.exception.*;
 import com.nnlight.utils.SerialTool;
+import com.nnlight.view.ViewLayout;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -39,7 +40,7 @@ public class ListenButtonListener implements ActionListener {
             listenFlag = false;
 
             // 每秒检查确认按钮是否可用, 如果不可用就设置为可用
-            Timer timer = new Timer();
+//            Timer timer = new Timer();
 //            timer.schedule(new TimerTask() {
 //                public void run() {
 //                    if (!okbutton.isEnabled() && new Date().getTime() - okLock > 1000 * 20) {
@@ -55,6 +56,7 @@ public class ListenButtonListener implements ActionListener {
             e.printStackTrace();
         } finally {
             listenButton.setEnabled(listenFlag);
+            ViewLayout.getViewLayout().setComponentEnabled(!listenFlag);
             cancelListenButton.setEnabled(!listenFlag);
         }
 //        }

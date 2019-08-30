@@ -1,5 +1,6 @@
 package com.nnlight.listeners;
 
+import com.nnlight.Client;
 import com.nnlight.entity.MsgEntity;
 import com.nnlight.entity.TextType;
 import com.nnlight.utils.CommonUtil;
@@ -15,7 +16,8 @@ import java.awt.event.ActionListener;
 public class AREAReadButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (CommonUtil.sendMsg(MsgEntity.AREAREAD)) {
+        Client.isReadStatus = false;
+        if (CommonUtil.sendStringMsg(MsgEntity.AREAREAD)) {
             CommonUtil.refreshPanel(TextType.AREA);
         }
     }

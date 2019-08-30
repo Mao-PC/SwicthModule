@@ -2,12 +2,15 @@ package com.nnlight.listeners;
 
 import static com.nnlight.Client.*;
 
+import com.nnlight.Client;
 import com.nnlight.entity.MsgEntity;
 import com.nnlight.utils.CommonUtil;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -16,31 +19,25 @@ import java.util.regex.Pattern;
  * @Description: 设置IMEI
  */
 public class IMEISetButtonListener implements ActionListener {
+
     @Override
     public void actionPerformed(ActionEvent e) {
+        Client.isReadStatus = false;
+
         // IMEI
         String imeiStr = imeiText.getText();
         int size = 17;
         // 校验IMEI
         if (!Pattern.matches("^\\d{" + size + "}$", imeiStr)) {
-            JOptionPane.showMessageDialog(null, "IMEI 必须是长度 18 的数字", "错误", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "IMEI 必须是长度 17 的数字", "错误", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
+        // 保存IMEI
+        allIMEI.add(imeiStr);
+
         // 自增IMEI
-        int orderNum = Integer.parseInt(imeiStr);
-
-        orderNum++;
-        StringBuilder orderStr = new StringBuilder(orderNum + "");
-        // 补全 18 位
-        if (orderStr.length() < size) {
-            int length = size - orderStr.length();
-            for (int i = 0; i < length; i++) {
-                orderStr.insert(0, 0);
-            }
-        }
-
-        imeiText.setText(orderStr.toString());
-        CommonUtil.sendMsg(MsgEntity.IMEISETTOKEN + "\"" + imeiStr + "\"");
+        imeiText.setText(CommonUtil.getIncImei(imeiStr, size));
+        CommonUtil.sendStringMsg(MsgEntity.IMEISETTOKEN + "\"" + imeiStr + "\"");
     }
 }

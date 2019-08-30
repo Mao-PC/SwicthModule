@@ -1,12 +1,20 @@
 package com.nnlight;
 
+import com.nnlight.entity.RecordFile;
 import com.nnlight.exception.ExceptionWriter;
+import com.nnlight.utils.ExcelUtil;
+import com.nnlight.utils.RecordFileUtil;
 import com.nnlight.utils.SerialTool;
 import com.nnlight.view.ViewLayout;
 import gnu.io.SerialPort;
+import org.apache.poi.hwpf.dev.RecordUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +24,7 @@ import java.util.List;
  */
 public class Client extends JFrame {
 
+    public static RecordFile record = null;
     private static volatile Client client = null;
 
     private Client() throws HeadlessException {
@@ -28,12 +37,14 @@ public class Client extends JFrame {
         return client;
     }
 
-    private ViewLayout viewLayout = ViewLayout.getViewLayout();
-
+    // 是否有事件在进行中
     public static volatile boolean actiongFlag = false;
 
-    // 是否在写数据中
-    public static volatile boolean isWriting = false;
+    // 所有的IMEI
+    public static List<String> allIMEI = new ArrayList<>();
+
+    // 是否读仪器状态
+    public static volatile boolean isReadStatus = false;
 
     private List<String> commList = null;    //保存可用端口号
     public static SerialPort serialPort = null;    //保存串口对象
@@ -94,6 +105,9 @@ public class Client extends JFrame {
     public static JButton clearButton = new JButton("清空测试区数据");
 
     public void openClient() {
+
+        record = RecordFileUtil.readRecord();
+
         this.setTitle("十二路继电器模块配置终端");
         this.setSize(1000, 600);
         this.setBackground(Color.WHITE);
@@ -102,15 +116,28 @@ public class Client extends JFrame {
         // 设置居中
         this.setLocationRelativeTo(null);
 
-        viewLayout.setPanelLayout();
+        ViewLayout.getViewLayout().setPanelLayout();
 
         //启动扫描串口线程
         new Thread(new RepaintThread()).start();
 
         this.setVisible(true);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // 窗口关闭时写 Excel
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    if (allIMEI != null && allIMEI.size() > 0) {
+                        ExcelUtil.writeExcel();
+                    }
+                    System.exit(0);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "错误", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
     }
-
     /*
      * 每隔30毫秒重扫描一次串口
      */
@@ -180,7 +207,6 @@ public class Client extends JFrame {
                 }
             }
         }
-
     }
 
     public static void main(String[] args) {

@@ -1,6 +1,8 @@
 package com.nnlight.listeners;
 
 import com.nnlight.Client;
+import com.nnlight.entity.MsgEntity;
+import com.nnlight.utils.CommonUtil;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -15,13 +17,17 @@ import java.util.regex.Pattern;
 public class SpaceSetButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+        Client.isReadStatus = false;
+
         // 动作间隔
-        String speceStr = Client.spaceText.getText().trim();
+        String spaceStr = Client.spaceText.getText().trim();
 
         // 校验IMEI
-        if (speceStr == null || speceStr.length() == 0 || !Pattern.matches("^\\d*$", speceStr) || Integer.parseInt(speceStr) < 0 || Integer.parseInt(speceStr) > 253) {
+        if (spaceStr == null || spaceStr.length() == 0 || !Pattern.matches("^\\d*$", spaceStr) || Integer.parseInt(spaceStr) < 0 || Integer.parseInt(spaceStr) > 60000) {
             JOptionPane.showMessageDialog(null, "动作间隔必须是 0 - 60000 的数字", "错误", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+
+        CommonUtil.sendStringMsg(MsgEntity.SPACERSETTOKEN + spaceStr);
     }
 }

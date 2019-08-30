@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 public class BOXSetButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
+        Client.isReadStatus = false;
+
         // BOXID
         String boxStr = Client.boxText.getText().trim();
 
@@ -26,6 +28,6 @@ public class BOXSetButtonListener implements ActionListener {
             return;
         }
 
-        CommonUtil.sendMsg(MsgEntity.BOXSETTOKEN + boxStr);
+        CommonUtil.sendStringMsg(MsgEntity.BOXSETTOKEN + boxStr);
     }
 }
